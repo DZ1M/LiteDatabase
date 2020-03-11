@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using LiteDatabase.Models;
+using LiteDatabase.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using LiteDatabase.Models;
+using System;
+using System.Diagnostics;
 
 namespace LiteDatabase.Controllers
 {
@@ -20,7 +18,33 @@ namespace LiteDatabase.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            return View(new DataBase().Listar());
+        }
+        [HttpPost]
+        public IActionResult Cadastrar(Usuario user)
+        {
+            new DataBase().Inserir(user);
+            TempData["Msg"] =  user.Nome + " foi cadastrado com sucesso!";
+            return RedirectToAction("Index");
+        }
+        [HttpPost]
+        public IActionResult Alterar(Usuario user)
+        {
+            new DataBase().Alterar(user);
+            TempData["Msg"] = user.Nome + " foi alterado com sucesso!";
+            return RedirectToAction("Index");
+        }
+        public IActionResult Excluir(Guid id)
+        {
+            var busca = new DataBase().BuscaPorId(id);
+            new DataBase().Excluir(id);
+            TempData["Msg"] = busca.Nome + " foi excluído com sucesso!";
+            return RedirectToAction("Index");
+        }
+        [HttpGet]
+        public IActionResult Alterar(Guid id)
+        {
+            return View(new DataBase().BuscaPorId(id));
         }
 
         public IActionResult Privacy()
